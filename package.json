@@ -1,15 +1,30 @@
 {
 	"name": "etherlab-nodejs",
-	"version": "0.1.4",
+	"version": "0.2.0",
 	"description": "Bind Etherlab's ethercat master to node.js",
-	"main": "lib/ecat.lib.js",
-	"bin": {
-		"ecat-run": "bin/cli.js",
-		"ecat-config": "bin/configure.js"
-	},
+	"main": "lib/ecat2.lib.js",
+	"files": [
+		"binding.gyp",
+		"CMakeLists.txt",
+		"LICENSE",
+		"lib/*",
+		"src/api.cc",
+		"src/etherlab-helper/COPYING",
+		"src/etherlab-helper/COPYING.LESSER",
+		"src/etherlab-helper/include/*",
+		"src/etherlab-helper/lib/rapidjson/include/*",
+		"src/etherlab-helper/lib/rapidjson/license.txt",
+		"src/etherlab-helper/src/*"
+	],
 	"scripts": {
 		"preinstall": "rm -rf build/",
-		"postinstall": "node-gyp rebuild"
+		"rebuild:cmake": "cmake-js -p$(nproc) rebuild",
+		"rebuild:gyp": "node-gyp -j$(nproc) --ensure rebuild",
+		"rebuild": "if [ -z $(command -v cmake) ];then npm run rebuild:gyp;else npm run rebuild:cmake;fi",
+		"build:debug": "ECAT_BUILD_DEBUG=1 npm run rebuild",
+		"build:verbose": "ECAT_BUILD_DEBUG=2 npm run rebuild",
+		"postinstall": "npm run rebuild",
+		"test": "cd test && npm test"
 	},
 	"repository": {
 		"type": "git",
@@ -24,9 +39,11 @@
 	],
 	"author": "iqrok",
 	"license": "LGPL-2.1",
+	"devDependencies": {
+		"cmake-js": "^7.2.1",
+		"node-gyp": "^9.4.0"
+	},
 	"dependencies": {
-		"bindings": "^1.5.0",
-		"node-addon-api": "^6.0.0",
-		"node-gyp": "^9.3.1"
+		"node-addon-api": "^6.1.0"
 	}
 }
